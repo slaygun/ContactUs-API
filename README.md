@@ -1,6 +1,5 @@
 # ContactUs-API + Frontend Demo
-ContactUs API that captures user details tryng to reach out and sends them to the organization's email.
+A simple ContactUs API that captures user details and sends them to the organization's email.
 
-### Used
--Fast API (ContactUs API)
--React + Tailwind (Contact Page with schema validation) 
+Built with Python, FastAPI, and Pydantic for robust data validation and efficient email handling. Frontend implemented using React and Tailwind CSS, with schema validation ensuring data integrity.
+
