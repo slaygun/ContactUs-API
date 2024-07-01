@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { z } from 'zod';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -6,6 +7,15 @@ const ContactForm = () => {
     lastName: '',
     email: '',
     message: '',
+  });
+  
+  const [errors, setErrors] = useState({});
+
+  const schema = z.object({
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
+    email: z.string().email('Invalid email address'),
+    message: z.string().min(1, 'Message is required'),
   });
 
   const handleChange = (e) => {
@@ -15,7 +25,20 @@ const ContactForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // alert(JSON.stringify(formData, null, 2));
+    try {
+      schema.parse(formData);
+      setErrors({});
+      // Handle form submission here (e.g., send data to server)
+      alert(JSON.stringify(formData, null, 2));
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        const fieldErrors = {};
+        e.errors.forEach((error) => {
+          fieldErrors[error.path[0]] = error.message;
+        });
+        setErrors(fieldErrors);
+      }
+    }
   };
 
   return (
@@ -34,6 +57,7 @@ const ContactForm = () => {
                 value={formData.firstName}
                 onChange={handleChange}
               />
+              {errors.firstName && <p className="text-red-500">{errors.firstName}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="lastName" className="block text-gray-400">Last name</label>
@@ -46,6 +70,7 @@ const ContactForm = () => {
                 value={formData.lastName}
                 onChange={handleChange}
               />
+              {errors.lastName && <p className="text-red-500">{errors.lastName}</p>}
             </div>
           </div>
           <div className="space-y-2">
@@ -59,6 +84,7 @@ const ContactForm = () => {
               value={formData.email}
               onChange={handleChange}
             />
+            {errors.email && <p className="text-red-500">{errors.email}</p>}
           </div>
           <div className="space-y-2">
             <label htmlFor="message" className="block text-gray-400">Message</label>
@@ -70,6 +96,7 @@ const ContactForm = () => {
               value={formData.message}
               onChange={handleChange}
             />
+            {errors.message && <p className="text-red-500">{errors.message}</p>}
           </div>
           <button
             type="submit"
