@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +12,6 @@ const ContactForm = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState('');
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -44,8 +45,7 @@ const ContactForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Clear previous status and errors
-    setStatus('');
+    // Clear previous errors
     setErrors({});
 
     // Validate form data
@@ -67,13 +67,19 @@ const ContactForm = () => {
         },
       });
 
-      setStatus('Your details have been sent successfully!');
+      toast.success('Your details have been sent successfully!', {
+        position: "bottom-right",
+      });
       console.log(response.data);
     } catch (error) {
       if (error.response && error.response.data) {
-        setStatus(`Error: ${error.response.data.detail}`);
+        toast.error(`Error: ${error.response.data.detail}`, {
+          position: "bottom-right",
+        });
       } else {
-        setStatus('There was a problem with your submission.');
+        toast.error('There was a problem with your submission.', {
+          position: "bottom-right",
+        });
       }
       console.error('Error:', error);
     }
@@ -142,9 +148,9 @@ const ContactForm = () => {
           >
             Submit
           </button>
-          {status && <p className="text-white">{status}</p>}
         </div>
       </form>
+      <ToastContainer />
     </div>
   );
 };
