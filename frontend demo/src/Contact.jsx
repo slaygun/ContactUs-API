@@ -12,6 +12,7 @@ const ContactForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -55,8 +56,10 @@ const ContactForm = () => {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
-      const response = await axios.post('http://127.0.0.1:8000/response', {
+      const response = await axios.post('process.env.API_ENDPOINT', {
         fname: formData.firstName,
         lname: formData.lastName,
         email: formData.email,
@@ -69,16 +72,19 @@ const ContactForm = () => {
 
       toast.success('Your details have been sent successfully!', {
         position: "bottom-right",
+        onClose: () => setIsSubmitting(false),
       });
       console.log(response.data);
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(`Error: ${error.response.data.detail}`, {
           position: "bottom-right",
+          onClose: () => setIsSubmitting(false),
         });
       } else {
         toast.error('There was a problem with your submission.', {
           position: "bottom-right",
+          onClose: () => setIsSubmitting(false),
         });
       }
       console.error('Error:', error);
@@ -142,12 +148,15 @@ const ContactForm = () => {
             />
             {errors.message && <p className="text-red-500">{errors.message}</p>}
           </div>
-          <button
-            type="submit"
-            className="px-4 py-2 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Submit
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              type="submit"
+              className="px-4 py-2 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Submit
+            </button>
+            {isSubmitting && <span className="text-blue-500">Sending!</span>}
+          </div>
         </div>
       </form>
       <ToastContainer />
