@@ -59,31 +59,35 @@ const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('process.env.API_ENDPOINT', {
-        fname: formData.firstName,
-        lname: formData.lastName,
-        email: formData.email,
-        message: formData.message,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        import.meta.env.VITE_API_ENDPOINT,
+        {
+          fname: formData.firstName,
+          lname: formData.lastName,
+          email: formData.email,
+          message: formData.message,
         },
-      });
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       toast.success('Your details have been sent successfully!', {
-        position: "bottom-right",
+        position: 'bottom-right',
         onClose: () => setIsSubmitting(false),
       });
       console.log(response.data);
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(`Error: ${error.response.data.detail}`, {
-          position: "bottom-right",
+          position: 'bottom-right',
           onClose: () => setIsSubmitting(false),
         });
       } else {
         toast.error('There was a problem with your submission.', {
-          position: "bottom-right",
+          position: 'bottom-right',
           onClose: () => setIsSubmitting(false),
         });
       }
