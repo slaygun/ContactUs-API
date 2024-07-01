@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from .models import User
 from .functions import send_email, text_content
 from dotenv import load_dotenv
@@ -14,6 +15,22 @@ PASSWORD = os.environ.get("PASSWORD")
 TO_EMAIL = os.environ.get("TO_EMAIL")
 
 app = FastAPI()
+
+# Define the origins that should be allowed to make requests to your FastAPI app
+origins = [
+    "http://localhost:5173",
+    # Add other origins if needed
+]
+
+# Add the CORSMiddleware to your FastAPI app
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
 
 @app.get("/")
 async def root():

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { z } from 'zod';
+import axios from 'axios';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -8,36 +8,74 @@ const ContactForm = () => {
     email: '',
     message: '',
   });
-  
-  const [errors, setErrors] = useState({});
 
-  const schema = z.object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
-    email: z.string().email('Invalid email address'),
-    message: z.string().min(1, 'Message is required'),
-  });
+  const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState('');
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.firstName) {
+      newErrors.firstName = 'First name is required';
+    }
+
+    if (!formData.lastName) {
+      newErrors.lastName = 'Last name is required';
+    }
+
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email address is invalid';
+    }
+
+    if (!formData.message) {
+      newErrors.message = 'Message is required';
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Clear previous status and errors
+    setStatus('');
+    setErrors({});
+
+    // Validate form data
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+
     try {
-      schema.parse(formData);
-      setErrors({});
-      // Handle form submission here (e.g., send data to server)
-      alert(JSON.stringify(formData, null, 2));
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        const fieldErrors = {};
-        e.errors.forEach((error) => {
-          fieldErrors[error.path[0]] = error.message;
-        });
-        setErrors(fieldErrors);
+      const response = await axios.post('http://127.0.0.1:8000/response', {
+        fname: formData.firstName,
+        lname: formData.lastName,
+        email: formData.email,
+        message: formData.message,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      setStatus('Your details have been sent successfully!');
+      console.log(response.data);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setStatus(`Error: ${error.response.data.detail}`);
+      } else {
+        setStatus('There was a problem with your submission.');
       }
+      console.error('Error:', error);
     }
   };
 
@@ -104,6 +142,7 @@ const ContactForm = () => {
           >
             Submit
           </button>
+          {status && <p className="text-white">{status}</p>}
         </div>
       </form>
     </div>
