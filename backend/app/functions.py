@@ -2,7 +2,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-def text_content(sender: str, fname: str, lname: str, message: str) -> str:
+def text_content(sender, fname: str, lname: str, message: str) -> str:
     text = f"email: {sender}\nname: {fname} {lname}\nmessage: {message}"
     return text
 
@@ -26,12 +26,12 @@ def send_email(smtp_server, port, login, password, to_email, text):
             server.ehlo()  
             server.starttls()  # Upgrade the connection to a secure encrypted SSL/TLS connection
             server.ehlo()  
-            # print("Logging in to SMTP server...")
+            print("Logging in to SMTP server...")
             server.login(login, password)
-            # print("Sending email...")
+            print("Sending email...")
             server.sendmail(login, to_email, msg.as_string())
             server.quit()  
-        # print("Email sent successfully!")
+        print("Email sent successfully!")
 
     except smtplib.SMTPAuthenticationError as e:
         print("Failed to authenticate with the SMTP server. Check your login credentials.")
